@@ -4,10 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>Verhalen</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div id="gesture-frame">
+        <div class="gesture-item">Gebaar 1</div>
+        <div class="gesture-item">Gebaar 2</div>
+        <div class="gesture-item">Gebaar 3</div>
+      </div>
+      <div id="image-frame">
+        <!-- Hier komt de AI-gegenereerde afbeelding -->
+        <img id="generated-image" src="" alt="AI gegenereerde afbeelding">
+      </div>
+    </div>
+    <div id="text-frame">
+      <!-- Hier komt de tekst -->
+      <p id="text-content">Hier komt de tekst die gaat veranderen...</p>
+    </div>
     <script type="module" src="/main.js"></script>
   </body>
 </html>
