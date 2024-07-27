@@ -1,27 +1,22 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Verhalen</title>
-  </head>
-  <body>
-    <div id="app">
-      <div id="gesture-frame">
-        <div class="gesture-item">Gebaar 1</div>
-        <div class="gesture-item">Gebaar 2</div>
-        <div class="gesture-item">Gebaar 3</div>
-      </div>
-      <div id="image-frame">
-        <!-- Hier komt de AI-gegenereerde afbeelding -->
-        <img id="generated-image" src="" alt="AI gegenereerde afbeelding">
-      </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMOG Storyteller</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+      <button onclick="location.href='Handtracker/handtracker.html'">Ga naar andere pagina</button>
+        <video id="video" width="720" height="560" autoplay muted></video>
+        <canvas id="overlay" width="720" height="560"></canvas>
+        <div id="story">
+            <p id="storyText">Welkom bij het interactieve verhaal! Maak een gebaar om te beginnen.</p>
+        </div>
+        <canvas id="drawing" width="720" height="560"></canvas>
     </div>
-    <div id="text-frame">
-      <!-- Hier komt de tekst -->
-      <p id="text-content">Hier komt de tekst die gaat veranderen...</p>
-    </div>
-    <script type="module" src="/main.js"></script>
-  </body>
+    <script src="https://cdn.jsdelivr.net/npm/handtrackjs@0.0.23/dist/handtrack.min.js"></script>
+    <script src="script.js"></script>
+</body>
 </html>
