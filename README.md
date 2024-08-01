@@ -1,1 +1,3 @@
-# Verhalen
+# Verhalen Setup
+
+#### By Britt Franken
