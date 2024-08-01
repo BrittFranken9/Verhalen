@@ -1,33 +1,13 @@
 body {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  height: 100vh;
-  margin: 0;
-  background-color: #f0f0f0;
+  justify-content: center;
 }
-
-#container {
-  position: relative;
+#canvas {
+  border: 1px solid black;
 }
-
-#video, #overlay, #drawing {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-#story {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 10px 20px;
-  border-radius: 10px;
-}
-
-#storyText {
-  font-size: 18px;
-  color: #333;
+#status {
+  font-size: 1.5em;
+  margin-top: 20px;
 }

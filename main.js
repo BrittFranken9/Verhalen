@@ -1,72 +1,97 @@
-import './style.css'
 const video = document.getElementById('video');
-const canvas = document.getElementById('overlay');
-const drawingCanvas = document.getElementById('drawing');
-const context = canvas.getContext('2d');
-const drawingContext = drawingCanvas.getContext('2d');
-const storyText = document.getElementById('storyText');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const statusDiv = document.getElementById('status');
 
-const modelParams = {
-    flipHorizontal: true,
-    maxNumBoxes: 1,
-    iouThreshold: 0.5,
-    scoreThreshold: 0.6,
-};
+async function setupCamera() {
+  video.width = 640;
+  video.height = 480;
 
-handTrack.startVideo(video).then(status => {
-    if (status) {
-        navigator.getUserMedia({ video: {} }, stream => {
-            video.srcObject = stream;
-            runDetection();
-        },
-        err => console.log(err)
-        );
-    }
-});
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: true
+  });
+  video.srcObject = stream;
 
-function runDetection() {
-    model.detect(video).then(predictions => {
-        model.renderPredictions(predictions, canvas, context, video);
-        if (predictions.length > 0) {
-            const hand = predictions[0];
-            handleGesture(hand);
+  return new Promise((resolve) => {
+    video.onloadedmetadata = () => {
+      resolve(video);
+    };
+  });
+}
+
+async function main() {
+  await setupCamera();
+  video.play();
+
+  const model = await handpose.load();
+  console.log('Handpose model loaded');
+
+  let isStarted = false;
+
+  async function detect() {
+    const predictions = await model.estimateHands(video);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    if (predictions.length > 0) {
+      const landmarks = predictions[0].landmarks;
+      drawHand(landmarks);
+
+      if (!isStarted) {
+        if (isThumbsUp(landmarks)) {
+          statusDiv.textContent = 'Gesture recognized: Thumbs Up';
+          setTimeout(() => {
+            isStarted = true;
+            statusDiv.textContent = 'System Started';
+          }, 1000);
+        } else if (isOpenHand(landmarks)) {
+          statusDiv.textContent = 'Gesture recognized: Open Hand (Stop)';
+          setTimeout(() => {
+            isStarted = false;
+            statusDiv.textContent = 'System Stopped';
+          }, 1000);
         }
-        requestAnimationFrame(runDetection);
-    });
-}
-
-function handleGesture(hand) {
-    const bbox = hand.bbox;
-    if (bbox[0] < canvas.width / 3) {
-        generateStoryAndDrawing("left");
-    } else if (bbox[0] > canvas.width * 2 / 3) {
-        generateStoryAndDrawing("right");
+      } else {
+        if (isOpenHand(landmarks)) {
+          statusDiv.textContent = 'Gesture recognized: Open Hand (Stop)';
+          setTimeout(() => {
+            isStarted = false;
+            statusDiv.textContent = 'System Stopped';
+          }, 1000);
+        }
+      }
     } else {
-        generateStoryAndDrawing("center");
+      statusDiv.textContent = 'Waiting for gesture...';
     }
+
+    requestAnimationFrame(detect);
+  }
+
+  detect();
 }
 
-function generateStoryAndDrawing(gesture) {
-    fetch('http://localhost:5000/generate', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ gesture: gesture })
-    })
-    .then(response => response.json())
-    .then(data => {
-        storyText.innerText = data.story;
-        drawVisual(data.drawing);
-    });
+function drawHand(landmarks) {
+  for (let i = 0; i < landmarks.length; i++) {
+    const [x, y] = landmarks[i];
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    ctx.fill();
+  }
 }
 
-function drawVisual(drawing) {
-    drawingContext.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-    drawingContext.fillStyle = drawing.color;
-    drawingContext.fillRect(50, 50, 200, 100); // Example drawing
+function isThumbsUp(landmarks) {
+  const [thumbTip, thumbIP, thumbMP, thumbCMC] = [4, 3, 2, 1].map(i => landmarks[i]);
+  const [indexTip, indexDIP] = [8, 7].map(i => landmarks[i]);
+
+  return (thumbTip[1] < thumbIP[1] && thumbIP[1] < thumbMP[1] && thumbMP[1] < thumbCMC[1]) && // Thumb is up
+         (indexTip[1] > indexDIP[1]); // Index finger is down
 }
 
-handTrack.load(modelParams).then(lmodel => {
-    model = lmodel;
-});
+function isOpenHand(landmarks) {
+  const fingers = [8, 12, 16, 20].map(i => landmarks[i]);
+  const palm = landmarks[0];
+  
+  return fingers.every(finger => finger[1] < palm[1]); // All fingers up
+}
+
+main();
