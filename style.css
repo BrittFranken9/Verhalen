@@ -5,14 +5,22 @@ body {
   justify-content: center;
   font-family: Arial, sans-serif;
   text-align: center;
+  background-image: url('/public/achtergrond.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  margin: 0;
 }
 
 h1 {
   margin-bottom: 10px;
+  color: white;
 }
 
 p {
   margin-bottom: 20px;
+  color: white;
 }
 
 #gestures {
@@ -40,4 +48,5 @@ p {
 #status {
   font-size: 1.5em;
   margin-top: 20px;
+  color: white;
 }
