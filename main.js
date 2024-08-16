@@ -2,61 +2,92 @@ const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const status = document.getElementById('status');
+const instructions = document.getElementById('instructions');
+const gestures = document.getElementById('gestures');
 
-// Load the handpose model
+let model;
+
+
 async function setupCamera() {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: true
-  });
-  video.srcObject = stream;
-
-  return new Promise((resolve) => {
-    video.onloadedmetadata = () => {
-      resolve(video);
-    };
-  });
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+    return new Promise((resolve) => {
+      video.onloadedmetadata = () => {
+        resolve(video);
+      };
+    });
+  } catch (error) {
+    console.error("Error accessing camera:", error);
+  }
 }
 
 async function main() {
+  status.classList.add('hidden');
+  instructions.classList.add('hidden');
+  gestures.classList.add('hidden');
+
   await setupCamera();
   video.play();
 
-  const model = await handpose.load();
-  status.innerText = 'Model loaded. Waiting for gesture...';
+  try {
+    model = await handpose.load();
+    console.log("Handpose model loaded");
 
-  detectHands(model);
+    setTimeout(() => {
+      detectHands();
+    }, 3500);
+
+  } catch (error) {
+    console.error("Error loading handpose model:", error);
+  }
 }
 
-async function detectHands(model) {
-  const predictions = await model.estimateHands(video);
+async function detectHands() {
+  let gestureDetected = false;
 
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  async function detect() {
+    try {
+      const predictions = await model.estimateHands(video);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  if (predictions.length > 0) {
-    const landmarks = predictions[0].landmarks;
+      if (predictions.length > 0) {
+        const landmarks = predictions[0].landmarks;
 
-    // Draw points on each predicted hand
-    for (let i = 0; i < landmarks.length; i++) {
-      const [x, y] = landmarks[i];
-      ctx.beginPath();
-      ctx.arc(x, y, 5, 0, 2 * Math.PI);
-      ctx.fillStyle = 'red';
-      ctx.fill();
-    }
+        for (let i = 0; i < landmarks.length; i++) {
+          const [x, y] = landmarks[i];
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = 'red';
+          ctx.fill();
+        }
 
-    const thumbUp = isThumbUp(landmarks);
+        const thumbUp = isThumbUp(landmarks);
 
-    if (thumbUp) {
-      status.innerText = 'Duim Omhoog gedetecteerd!';
-      window.location.href = '/Verhaalscherm/verhaal.html';
+        if (thumbUp && !gestureDetected) {
+          gestureDetected = true;
+
+          document.querySelector('h1').classList.add('hidden');
+          document.querySelector('p').classList.add('hidden');
+          status.classList.add('hidden');
+          gestures.classList.add('hidden'); 
+
+          setTimeout(() => {
+            window.location.href = '/Verhaalscherm/verhaal.html';
+          }, 3000);
+        }
+      }
+
+      requestAnimationFrame(detect);
+    } catch (error) {
+      console.error("Error detecting hands:", error);
     }
   }
 
-  requestAnimationFrame(() => detectHands(model));
+  detect();
 }
 
 function isThumbUp(landmarks) {
-  // Simple thumb up detection logic based on landmark positions
   const thumbTip = landmarks[4];
   const thumbMcp = landmarks[2];
   const indexTip = landmarks[8];

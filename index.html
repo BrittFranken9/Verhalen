@@ -12,19 +12,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
 </head>
 <body>
-  <h1>Welkom bij SMOG-Verhalen</h1>
-  <p>Uitleg tekst en hoe ze moeten beginnen.</p>
-  
   <div id="gestures">
     <div class="gesture">
-      <img src="thumb_up.png" alt="Duim Omhoog">
-      <p>Duim Omhoog</p>
+      <img src="handen.png" alt="Duim Omhoog">
     </div>
   </div>
+  
+  <h1>WELKOM</h1>
+  <p>Maak je eigen verhaal doormiddel van gebaren.<br> Klaar om te beginnen? Steek je duim omhoog!</p>
   
   <video id="video" class="hidden" width="640" height="480" autoplay></video>
   <canvas id="canvas" class="hidden" width="640" height="480"></canvas>
   
-  <div id="status"></div>
+  <div id="status" class="hidden">Model loaded. Waiting for gesture...</div>
+  <p id="instructions" class="hidden">Maak een gebaar om verder te gaan.</p>
 </body>
 </html>
