@@ -1,62 +1,61 @@
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const status = document.getElementById('status');
+const textOutput = document.getElementById('recognized-text');
+const gestureGuide = document.getElementById('gesture-guide');
+const gestureImages = gestureGuide.getElementsByClassName('gesture-img');
 
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-  const status = document.getElementById('status');
-  const textOutput = document.getElementById('recognized-text');
-  const gestureGuide = document.getElementById('gesture-guide');
-  const gestureImages = gestureGuide.getElementsByClassName('gesture-img');
+let model;
+let isDetecting = false;
+const historyKey = 'gestureHistory'; // Sleutel voor localStorage
 
-  let model;
-  let isDetecting = false;
-  const historyKey = 'gestureHistory'; // Sleutel voor localStorage
+// Laad de geschiedenis uit localStorage
+function loadHistory() {
+    const storedHistory = localStorage.getItem(historyKey);
+    return storedHistory ? JSON.parse(storedHistory) : [];
+}
 
-  // Laad de geschiedenis uit localStorage
-  function loadHistory() {
-      const storedHistory = localStorage.getItem(historyKey);
-      return storedHistory ? JSON.parse(storedHistory) : [];
-  }
+const historyOutput = document.getElementById('history-output');
 
-  const historyOutput = document.getElementById('history-output');
+// Bewaar de geschiedenis in localStorage
+function saveHistory(history) {
+    localStorage.setItem(historyKey, JSON.stringify(history));
+}
 
-  // Bewaar de geschiedenis in localStorage
-  function saveHistory(history) {
-      localStorage.setItem(historyKey, JSON.stringify(history));
-  }
+// Update de geschiedenisweergave
+function updateHistory(letter) {
+    let gestureHistory = loadHistory();
+    gestureHistory.unshift(letter); // Voeg de nieuwe letter toe aan het begin van de geschiedenis
+    if (gestureHistory.length > 10) {
+        gestureHistory.pop(); // Beperk de geschiedenis tot de laatste 10 items
+    }
+    saveHistory(gestureHistory); // Bewaar de bijgewerkte geschiedenis
+    historyOutput.textContent = gestureHistory.join(' '); // Update de weergave van de geschiedenis
+}
 
-  // Update de geschiedenisweergave
-  function updateHistory(letter) {
-      let gestureHistory = loadHistory();
-      gestureHistory.unshift(letter); // Voeg de nieuwe letter toe aan het begin van de geschiedenis
-      if (gestureHistory.length > 10) {
-          gestureHistory.pop(); // Beperk de geschiedenis tot de laatste 10 items
-      }
-      saveHistory(gestureHistory); // Bewaar de bijgewerkte geschiedenis
-      historyOutput.textContent = gestureHistory.join(' '); // Update de weergave van de geschiedenis
-  }
-
-  // Verberg alle gebarenafbeeldingen
-  function hideAllGestures() {
-      for (const img of gestureImages) {
-          img.style.display = 'none';
-      }
-  }
-
-// Verberg de rest van de afbeeldingen door de transparantie aan te passen
-function showGestureImage(letter) {
-    const img = document.getElementById(`gesture-${letter}`);
-    if (img) {
-        // Zorg dat alle afbeeldingen half transparant zijn behalve de gedetecteerde letter
-        for (const gesture of gestureImages) {
-            gesture.style.opacity = '0.5';  // Half transparant
-        }
-
-        // Zet de afbeelding van de gedetecteerde letter weer volledig zichtbaar
-        img.style.opacity = '1';
+// Verberg alle gebarenafbeeldingen
+function hideAllGestures() {
+    for (const img of gestureImages) {
+        img.style.display = 'none';
     }
 }
 
-  async function setupCamera() {
+// Toon de afbeelding voor de gedetecteerde letter
+function showGestureImage(letter) {
+    hideAllGestures();
+    const img = document.getElementById(`gesture-${letter}`);
+    if (img) {
+        img.style.display = 'block';
+    }
+}
+
+// Verberg de gebaren gids als er geen gebaar wordt herkend
+function toggleGestureGuide(show) {
+    gestureGuide.classList.toggle('hidden', !show);
+}
+
+async function setupCamera() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
         video.srcObject = stream;
@@ -73,17 +72,17 @@ function showGestureImage(letter) {
 }
 
 async function main() {
-    status.classList.add('hidden');
-
+    status.textContent = 'Loading model...'; // Statusbericht voor model laden
     await setupCamera();
-
     try {
         model = await handpose.load();
         console.log("Handpose model loaded");
-        canvas.classList.remove('hidden'); // Zorg ervoor dat de canvas zichtbaar is
+        canvas.style.display = 'block'; // Zorg ervoor dat de canvas zichtbaar is
+        status.textContent = 'Model loaded. Please make a gesture.';
         detectHands();
     } catch (error) {
         console.error("Error loading handpose model:", error);
+        status.textContent = 'Error loading model.';
     }
 }
 
@@ -91,99 +90,83 @@ let lastDetectionTime = 0;
 const detectionDelay = 3000; // 3 seconden vertraging in milliseconden
 
 async function detect() {
-  if (isDetecting) return;
-  isDetecting = true;
+    if (isDetecting) return;
+    isDetecting = true;
 
-  try {
-      const now = Date.now();
-      if (now - lastDetectionTime < detectionDelay) {
-          isDetecting = false;
-          requestAnimationFrame(detect);
-          return;
-      }
-
-      const predictions = await model.estimateHands(video);
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvas leegmaken
-
-      if (predictions.length > 0) {
-          const landmarks = predictions[0].landmarks;
-
-                  // Herkenning van gebaren
-                  let detectedLetter = null;
-                  if (isAGesture(landmarks)) {
-                      detectedLetter = 'A';
-                  } else if (isBGesture(landmarks)) {
-                      detectedLetter = 'B';
-                  } else if (isCGesture(landmarks)) {
-                      detectedLetter = 'C';
-                  } else if (isDGesture(landmarks)) {
-                      detectedLetter = 'D';
-                  } else if (isEGesture(landmarks)) {
-                      detectedLetter = 'E';
-                  } else if (isFGesture(landmarks)) {
-                      detectedLetter = 'F';
-                  } else if (isGGesture(landmarks)) {
-                      detectedLetter = 'G';
-                  } else if (isHGesture(landmarks)) {
-                      detectedLetter = 'H';
-                  } else if (isIGesture(landmarks)) {
-                      detectedLetter = 'I';
-                  } else if (isJGesture(landmarks)) {
-                      detectedLetter = 'J';
-                  } else if (isKGesture(landmarks)) {
-                      detectedLetter = 'K';
-                  } else if (isLGesture(landmarks)) {
-                      detectedLetter = 'L';
-                  } else if (isMGesture(landmarks)) {
-                      detectedLetter = 'M';
-                  } else if (isNGesture(landmarks)) {
-                      detectedLetter = 'N';
-                  } else if (isOGesture(landmarks)) {
-                      detectedLetter = 'O';
-                  } else if (isPGesture(landmarks)) {
-                      detectedLetter = 'P';
-                  } else if (isQGesture(landmarks)) {
-                      detectedLetter = 'Q';
-                  } else if (isRGesture(landmarks)) {
-                      detectedLetter = 'R';
-                  } else if (isSGesture(landmarks)) {
-                      detectedLetter = 'S';
-                  } else if (isTGesture(landmarks)) {
-                      detectedLetter = 'T';
-                  } else if (isUGesture(landmarks)) {
-                      detectedLetter = 'U';
-                  } else if (isVGesture(landmarks)) {
-                      detectedLetter = 'V';
-                  } else if (isWGesture(landmarks)) {
-                      detectedLetter = 'W';
-                  } else if (isXGesture(landmarks)) {
-                      detectedLetter = 'X';
-                  } else if (isYGesture(landmarks)) {
-                      detectedLetter = 'Y';
-                  } else if (isZGesture(landmarks)) {
-                  detectedLetter = 'Z';
-                  }
-                
-
-                  if (detectedLetter) {
-                    console.log("Gedetecteerde letter:", detectedLetter);
-                    textOutput.textContent = `Detected Gesture: ${detectedLetter}`;
-                    updateHistory(detectedLetter);
-                    showGestureImage(detectedLetter);
-
-                    lastDetectionTime = Date.now(); // Update de tijd van de laatste detectie
-                }
-            }
-        } catch (error) {
-            console.error("Error detecting hands:", error);
+    try {
+        const now = Date.now();
+        if (now - lastDetectionTime < detectionDelay) {
+            isDetecting = false;
+            requestAnimationFrame(detect);
+            return;
         }
 
-        isDetecting = false;
-        requestAnimationFrame(detect);
+        const predictions = await model.estimateHands(video);
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvas leegmaken
+
+        if (predictions.length > 0) {
+            const landmarks = predictions[0].landmarks;
+            let detectedLetter = null;
+            if (isAGesture(landmarks)) detectedLetter = 'A';
+            else if (isBGesture(landmarks)) detectedLetter = 'B';
+            else if (isCGesture(landmarks)) detectedLetter = 'C';
+            else if (isDGesture(landmarks)) detectedLetter = 'D';
+            else if (isEGesture(landmarks)) detectedLetter = 'E';
+            else if (isFGesture(landmarks)) detectedLetter = 'F';
+            else if (isGGesture(landmarks)) detectedLetter = 'G';
+            else if (isHGesture(landmarks)) detectedLetter = 'H';
+            else if (isIGesture(landmarks)) detectedLetter = 'I';
+            else if (isJGesture(landmarks)) detectedLetter = 'J';
+            else if (isKGesture(landmarks)) detectedLetter = 'K';
+            else if (isLGesture(landmarks)) detectedLetter = 'L';
+            else if (isMGesture(landmarks)) detectedLetter = 'M';
+            else if (isNGesture(landmarks)) detectedLetter = 'N';
+            else if (isOGesture(landmarks)) detectedLetter = 'O';
+            else if (isPGesture(landmarks)) detectedLetter = 'P';
+            else if (isQGesture(landmarks)) detectedLetter = 'Q';
+            else if (isRGesture(landmarks)) detectedLetter = 'R';
+            else if (isSGesture(landmarks)) detectedLetter = 'S';
+            else if (isTGesture(landmarks)) detectedLetter = 'T';
+            else if (isUGesture(landmarks)) detectedLetter = 'U';
+            else if (isVGesture(landmarks)) detectedLetter = 'V';
+            else if (isWGesture(landmarks)) detectedLetter = 'W';
+            else if (isXGesture(landmarks)) detectedLetter = 'X';
+            else if (isYGesture(landmarks)) detectedLetter = 'Y';
+            else if (isZGesture(landmarks)) detectedLetter = 'Z';
+
+            if (detectedLetter) {
+                status.textContent = 'Detected gesture: ' + detectedLetter;
+                textOutput.textContent = 'Detected Gesture: ' + detectedLetter;
+                showGestureImage(detectedLetter);
+                updateHistory(detectedLetter);
+                showLetterImage(detectedLetter); // Toon de afbeelding van de letter
+                lastDetectionTime = now; // Update de laatste detectietijd
+                toggleGestureGuide(true); // Toon de gebaren gids
+            } else {
+                status.textContent = 'No gesture detected';
+                textOutput.textContent = 'Detected Gesture: None';
+                toggleGestureGuide(false);
+                hideLetterImage(); // Verberg de afbeelding van de letter
+            }
+        } else {
+            status.textContent = 'No hand detected';
+            textOutput.textContent = 'Detected Gesture: None';
+            toggleGestureGuide(false);
+        }
+
+        lastDetectionTime = now;
+    } catch (error) {
+        console.error("Error detecting hands:", error);
+        status.textContent = 'Error detecting hands.';
     }
 
-    detect();
+    isDetecting = false;
+    requestAnimationFrame(detect);
+}
 
+function detectHands() {
+    detect();
+}
 
 // Gebarenherkenningsfuncties
 function isAGesture(landmarks) {

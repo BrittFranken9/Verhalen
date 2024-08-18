@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Hand Gesture Recognition</title>
     <link rel="stylesheet" href="verhaal.css">
-   
 </head>
 <body>
-    <h1 id="hoofd"></h1>
-    <p id="status"></p>
+    <h1 id="hoofd">Doe het gebaar na</h1>
+    <p id="status">Verwacht gebaar...</p>
     <div id="recognized-text">Detected Gesture: </div>
     <div id="history-output"></div>
 
-    <video id="video" class="hidden" width="640" height="480" autoplay></video>
+    <video id="video" width="640" height="480" autoplay></video>
     <canvas id="canvas" width="640" height="480"></canvas>
+
+    <div id="letter-image-container">
+        <img id="letter-image" src="" alt="Detected letter">
+    </div>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <div id="status"></div>
+    <div id="recognized-text"></div>
+
+
       <div id="gesture-guide">
         <div class="gesture-container">
             <img id="gesture-A" src="/public/letters/A.png" alt="Gesture A" class="gesture-img">

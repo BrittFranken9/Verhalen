@@ -11,8 +11,7 @@ body {
   background-repeat: no-repeat;
   min-height: 100vh;
   margin: 0;
-  margin-left: 50px;
-  position: relative; /* Zorgt ervoor dat de absoluut gepositioneerde elementen relatief gepositioneerd zijn */
+  position: relative;
 }
 
 h1 {
@@ -39,24 +38,21 @@ p {
   margin-top: 20px;
 }
 
-
-/* Zorg ervoor dat het video element onzichtbaar is */
-#video {
+#video, #canvas {
   display: none;
 }
-
 
 #gesture-guide {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   align-content: flex-start;
-  position: fixed; /* Zorgt ervoor dat de afbeeldingen vast aan de rechterkant van het scherm blijven */
-  right: 0; /* Positioneer de container aan de rechterkant */
-  top: 0; /* Begin bovenaan het scherm */
-  height: 100vh; /* De hoogte van het scherm gebruiken */
-  overflow-y: auto; /* Scroll als er te veel items zijn voor het scherm */
-  z-index: 1000; /* Zorg ervoor dat het element boven andere elementen op de pagina staat */
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1000;
 }
 
 .gesture-container {
@@ -68,10 +64,28 @@ p {
 .gesture-img {
   width: 100px;
   height: auto;
+  opacity: 0.5; /* Standaard doorzichtigheid voor gebaren */
 }
 
 .gesture-label {
   font-size: 1em;
-  color: #080b6b95;
+  color: #080b6b00;
   text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+#letter-image-container {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: none; /* Verberg de container standaard */
+}
+
+#letter-image-container img {
+  width: 100px; /* Pas de grootte van de afbeelding aan indien nodig */
 }
