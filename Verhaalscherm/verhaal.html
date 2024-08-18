@@ -7,21 +7,28 @@
     <link rel="stylesheet" href="verhaal.css">
 </head>
 <body>
-    <h1 id="hoofd">Doe het gebaar na</h1>
-    <p id="status">Verwacht gebaar...</p>
-    <div id="recognized-text">Detected Gesture: </div>
-    <div id="history-output"></div>
+    <h1 id="hoofd">Laat je hand zien voor gebaarherkenning</h1>
+    <p id="status"></p>
+    <div id="recognized-text">Probeer verschillende gebaren uit om de juiste letter te vinden!</div>
+
+    <!-- Container voor de kleine letterafbeelding -->
+<div id="small-letter-image-container">
+    <img id="small-letter-image" alt="">
+  </div>
+  
+  <!-- Container voor de grote letterafbeelding -->
+  <div id="large-letter-image-container">
+    <img id="large-letter-image" src="" alt="Large Letter Image">
+  </div>
 
     <video id="video" width="640" height="480" autoplay></video>
     <canvas id="canvas" width="640" height="480"></canvas>
+
+
 
     <div id="letter-image-container">
         <img id="letter-image" src="" alt="Detected letter">
     </div>
-    <video id="video" width="640" height="480" autoplay></video>
-    <canvas id="canvas" width="640" height="480"></canvas>
-    <div id="status"></div>
-    <div id="recognized-text"></div>
 
 
       <div id="gesture-guide">

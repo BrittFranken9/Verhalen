@@ -5,34 +5,78 @@ const status = document.getElementById('status');
 const textOutput = document.getElementById('recognized-text');
 const gestureGuide = document.getElementById('gesture-guide');
 const gestureImages = gestureGuide.getElementsByClassName('gesture-img');
+const letterImage = document.getElementById('letter-image'); // Voor het tonen van de afbeelding van de letter
+
+const letterImageContainer = document.getElementById('letter-image-container');
+
+const largeLetterImageContainer = document.getElementById('large-letter-image-container');
+const largeLetterImage = document.getElementById('large-letter-image');
+const smallLetterImageContainer = document.getElementById('small-letter-image-container');
+const smallLetterImage = document.getElementById('small-letter-image');
+
+// Volg de huidige letter
+let currentLetter = null;
+
+// Toon de afbeelding van de letter groot en vraag om na te doen
+function showLargeLetterImage(letter) {
+    const largeImagePath = `/public/letters/${letter}.png`; // Zorg ervoor dat je grote afbeeldingen hebt
+    largeLetterImage.src = largeImagePath;
+
+    largeLetterImage.onload = () => {
+        largeLetterImageContainer.style.display = 'block';
+    };
+
+    largeLetterImage.onerror = () => {
+        console.error("Failed to load large image at", largeImagePath);
+    };
+}
+
+// Verberg de grote afbeelding
+function hideLargeLetterImage() {
+    largeLetterImageContainer.style.display = 'none';
+}
+
+// Toon de kleine afbeelding van de letter
+function showSmallLetterImage(letter) {
+    const smallImagePath = `/public/letters/${letter}.png`; // Kleine versie gebruiken
+    smallLetterImage.src = smallImagePath;
+
+    smallLetterImage.onload = () => {
+        smallLetterImageContainer.style.display = 'block';
+    };
+
+    smallLetterImage.onerror = () => {
+        console.error("Failed to load small image at", smallImagePath);
+    };
+}
+
+// Verberg de kleine afbeelding
+function hideSmallLetterImage() {
+    smallLetterImageContainer.style.display = 'none';
+}
+
+// Schakel naar de volgende letter
+function proceedToNextLetter() {
+    hideLargeLetterImage();
+    currentLetter = getNextLetter(); // Implementatie voor het ophalen van de volgende letter
+    if (currentLetter) {
+        showSmallLetterImage(currentLetter);
+        showLargeLetterImage(currentLetter);
+    }
+}
+
+// Hier kun je logica toevoegen om de letter te controleren en over te schakelen naar de volgende letter
+function onGestureDetected(letter) {
+    if (currentLetter === letter) {
+        proceedToNextLetter();
+    }
+}
+
+
+console.log(letterImageContainer);
 
 let model;
 let isDetecting = false;
-const historyKey = 'gestureHistory'; // Sleutel voor localStorage
-
-// Laad de geschiedenis uit localStorage
-function loadHistory() {
-    const storedHistory = localStorage.getItem(historyKey);
-    return storedHistory ? JSON.parse(storedHistory) : [];
-}
-
-const historyOutput = document.getElementById('history-output');
-
-// Bewaar de geschiedenis in localStorage
-function saveHistory(history) {
-    localStorage.setItem(historyKey, JSON.stringify(history));
-}
-
-// Update de geschiedenisweergave
-function updateHistory(letter) {
-    let gestureHistory = loadHistory();
-    gestureHistory.unshift(letter); // Voeg de nieuwe letter toe aan het begin van de geschiedenis
-    if (gestureHistory.length > 10) {
-        gestureHistory.pop(); // Beperk de geschiedenis tot de laatste 10 items
-    }
-    saveHistory(gestureHistory); // Bewaar de bijgewerkte geschiedenis
-    historyOutput.textContent = gestureHistory.join(' '); // Update de weergave van de geschiedenis
-}
 
 // Verberg alle gebarenafbeeldingen
 function hideAllGestures() {
@@ -41,7 +85,7 @@ function hideAllGestures() {
     }
 }
 
-// Toon de afbeelding voor de gedetecteerde letter
+// Toon de afbeelding voor het gedetecteerde gebaar
 function showGestureImage(letter) {
     hideAllGestures();
     const img = document.getElementById(`gesture-${letter}`);
@@ -53,6 +97,38 @@ function showGestureImage(letter) {
 // Verberg de gebaren gids als er geen gebaar wordt herkend
 function toggleGestureGuide(show) {
     gestureGuide.classList.toggle('hidden', !show);
+}
+
+function showLetterImage(letter) {
+    const imagePath = `/public/letters/${letter}.png`;
+    console.log("Image Path:", imagePath); // Controleer het pad in de console
+    letterImage.src = imagePath;
+
+    // Voeg een onload functie toe om te controleren of de afbeelding is geladen
+    letterImage.onload = () => {
+        console.log("Image loaded successfully.");
+        letterImageContainer.style.display = 'block';
+    };
+
+    letterImage.onerror = () => {
+        console.error("Failed to load image at", imagePath);
+    };
+}
+
+function hideLetterImage() {
+    letterImageContainer.style.display = 'none'; // Verberg de container
+}
+
+// Toon zowel de afbeelding van de letter als die van het gebaar
+function showLetterAndGestureImages(letter) {
+    showLetterImage(letter); // Toon de afbeelding van de letter
+    showGestureImage(letter); // Toon de afbeelding van het gebaar
+}
+
+// Verberg zowel de afbeelding van de letter als die van het gebaar
+function hideAllImages() {
+    hideLetterImage(); // Verberg de afbeelding van de letter
+    hideAllGestures(); // Verberg de afbeelding van het gebaar
 }
 
 async function setupCamera() {
@@ -72,17 +148,17 @@ async function setupCamera() {
 }
 
 async function main() {
-    status.textContent = 'Loading model...'; // Statusbericht voor model laden
+    status.textContent = ''; // Statusbericht voor model laden
     await setupCamera();
     try {
         model = await handpose.load();
         console.log("Handpose model loaded");
         canvas.style.display = 'block'; // Zorg ervoor dat de canvas zichtbaar is
-        status.textContent = 'Model loaded. Please make a gesture.';
+        status.textContent = '';
         detectHands();
     } catch (error) {
         console.error("Error loading handpose model:", error);
-        status.textContent = 'Error loading model.';
+        status.textContent = '';
     }
 }
 
@@ -90,6 +166,9 @@ let lastDetectionTime = 0;
 const detectionDelay = 3000; // 3 seconden vertraging in milliseconden
 
 async function detect() {
+    const hoofd = document.getElementById('hoofd');
+    hoofd.style.display = 'none'; // Verberg de tekst
+
     if (isDetecting) return;
     isDetecting = true;
 
@@ -135,29 +214,31 @@ async function detect() {
             else if (isZGesture(landmarks)) detectedLetter = 'Z';
 
             if (detectedLetter) {
-                status.textContent = 'Detected gesture: ' + detectedLetter;
-                textOutput.textContent = 'Detected Gesture: ' + detectedLetter;
-                showGestureImage(detectedLetter);
-                updateHistory(detectedLetter);
-                showLetterImage(detectedLetter); // Toon de afbeelding van de letter
-                lastDetectionTime = now; // Update de laatste detectietijd
-                toggleGestureGuide(true); // Toon de gebaren gids
-            } else {
-                status.textContent = 'No gesture detected';
-                textOutput.textContent = 'Detected Gesture: None';
-                toggleGestureGuide(false);
-                hideLetterImage(); // Verberg de afbeelding van de letter
-            }
+        status.textContent = detectedLetter;
+        textOutput.textContent = detectedLetter;
+        showSmallLetterImage(detectedLetter); // Toon kleine afbeelding bovenaan
+        showLargeLetterImage(detectedLetter); // Toon grote afbeelding in het midden
+        currentLetter = detectedLetter; // Houd de huidige letter bij
+        lastDetectionTime = now; // Update de laatste detectietijd
+        toggleGestureGuide(true); // Toon de gebaren gids
+    } else {
+        status.textContent = '';
+        textOutput.textContent = '';
+        toggleGestureGuide(false);
+        hideAllImages(); // Verberg beide afbeeldingen
+    }
+
         } else {
-            status.textContent = 'No hand detected';
-            textOutput.textContent = 'Detected Gesture: None';
+            status.textContent = '';
+            textOutput.textContent = '';
             toggleGestureGuide(false);
+            hideAllImages(); // Verberg beide afbeeldingen
         }
 
         lastDetectionTime = now;
     } catch (error) {
         console.error("Error detecting hands:", error);
-        status.textContent = 'Error detecting hands.';
+        status.textContent = '';
     }
 
     isDetecting = false;

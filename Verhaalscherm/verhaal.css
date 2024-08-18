@@ -43,38 +43,37 @@ p {
 }
 
 #gesture-guide {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  align-content: flex-start;
   position: fixed;
   right: 0;
   top: 0;
   height: 100vh;
   overflow-y: auto;
   z-index: 1000;
+  display: none;
 }
 
-.gesture-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.gesture-img {
-  width: 100px;
-  height: auto;
-  opacity: 0.5; /* Standaard doorzichtigheid voor gebaren */
-}
 
 .gesture-label {
   font-size: 1em;
-  color: #080b6b00;
+  color: #373a7feb;
   text-align: center;
 }
 
 .hidden {
   display: none;
+}
+
+.gesture-container  {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: none; /* Dit moet worden aangepast door JavaScript */
+}
+
+.gesture-img{
+  width: 100px; /* Pas de grootte aan indien nodig */
 }
 
 #letter-image-container {
@@ -83,9 +82,42 @@ p {
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
+  display: none; /* Dit moet worden aangepast door JavaScript */
+  height: 100px;
+  width: 100px;
+}
+
+#letter-image {
+  width: 100px; /* Pas de grootte aan indien nodig */
+  height: 100px;
+}
+
+/* Zorg ervoor dat de letterafbeelding groot weergegeven wordt */
+#large-letter-image-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
   display: none; /* Verberg de container standaard */
 }
 
-#letter-image-container img {
-  width: 100px; /* Pas de grootte van de afbeelding aan indien nodig */
+#large-letter-image {
+  width: 300px; /* Grotere grootte voor betere zichtbaarheid */
+  height: auto;
+}
+
+/* Kleine versie bovenaan, blijft zichtbaar */
+#small-letter-image-container {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: block; /* Altijd zichtbaar */
+}
+
+#small-letter-image {
+  width: 100px; /* Kleine grootte */
+  height: auto;
 }
