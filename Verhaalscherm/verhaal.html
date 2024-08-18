@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Hand Gesture Recognition</title>
+    <link rel="stylesheet" href="verhaal.css">
+   
+</head>
+<body>
+    <h1 id="hoofd"></h1>
+    <p id="status"></p>
+    <div id="recognized-text">Detected Gesture: </div>
+    <div id="history-output"></div>
+
+    <video id="video" class="hidden" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+      <div id="gesture-guide">
+        <div class="gesture-container">
+            <img id="gesture-A" src="/public/letters/A.png" alt="Gesture A" class="gesture-img">
+            <div class="gesture-label">A</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-B" src="/public/letters/B.png" alt="Gesture B" class="gesture-img">
+            <div class="gesture-label">B</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-C" src="/public/letters/C.png" alt="Gesture C" class="gesture-img">
+            <div class="gesture-label">C</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-D" src="/public/letters/D.png" alt="Gesture D" class="gesture-img">
+            <div class="gesture-label">D</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-E" src="/public/letters/E.png" alt="Gesture E" class="gesture-img">
+            <div class="gesture-label">E</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-F" src="/public/letters/F.png" alt="Gesture F" class="gesture-img">
+            <div class="gesture-label">F</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-G" src="/public/letters/G.png" alt="Gesture G" class="gesture-img">
+            <div class="gesture-label">G</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-H" src="/public/letters/H.png" alt="Gesture H" class="gesture-img">
+            <div class="gesture-label">H</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-I" src="/public/letters/I.png" alt="Gesture I" class="gesture-img">
+            <div class="gesture-label">I</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-J" src="/public/letters/J.png" alt="Gesture J" class="gesture-img">
+            <div class="gesture-label">J</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-K" src="/public/letters/K.png" alt="Gesture K" class="gesture-img">
+            <div class="gesture-label">K</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-L" src="/public/letters/L.png" alt="Gesture L" class="gesture-img">
+            <div class="gesture-label">L</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-M" src="/public/letters/M.png" alt="Gesture M" class="gesture-img">
+            <div class="gesture-label">M</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-N" src="/public/letters/N.png" alt="Gesture N" class="gesture-img">
+            <div class="gesture-label">N</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-O" src="/public/letters/O.png" alt="Gesture O" class="gesture-img">
+            <div class="gesture-label">O</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-P" src="/public/letters/P.png" alt="Gesture P" class="gesture-img">
+            <div class="gesture-label">P</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-Q" src="/public/letters/Q.png" alt="Gesture Q" class="gesture-img">
+            <div class="gesture-label">Q</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-R" src="/public/letters/R.png" alt="Gesture R" class="gesture-img">
+            <div class="gesture-label">R</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-S" src="/public/letters/S.png" alt="Gesture S" class="gesture-img">
+            <div class="gesture-label">S</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-T" src="/public/letters/T.png" alt="Gesture T" class="gesture-img">
+            <div class="gesture-label">T</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-U" src="/public/letters/U.png" alt="Gesture U" class="gesture-img">
+            <div class="gesture-label">U</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-V" src="/public/letters/V.png" alt="Gesture V" class="gesture-img">
+            <div class="gesture-label">V</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-W" src="/public/letters/W.png" alt="Gesture W" class="gesture-img">
+            <div class="gesture-label">W</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-X" src="/public/letters/X.png" alt="Gesture X" class="gesture-img">
+            <div class="gesture-label">X</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-Y" src="/public/letters/Y.png" alt="Gesture Y" class="gesture-img">
+            <div class="gesture-label">Y</div>
+        </div>
+        <div class="gesture-container">
+            <img id="gesture-Z" src="/public/letters/Z.png" alt="Gesture Z" class="gesture-img">
+            <div class="gesture-label">Z</div>
+        </div>
+    </div>
+
+  </div>
+
+    <!-- Voeg je scripts hier toe, nadat de HTML is geladen -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
+    <script src="verhaal.js"></script>
+    
+</body>
+</html>

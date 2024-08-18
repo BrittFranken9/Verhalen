@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Verhalen</title>
+  <link rel="stylesheet" href="tussen.css">
+
+  <script src="tussen.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
+</head>
+<body>
+  <div id="gestures">
+    <div class="gesture">
+      <img src="/public/handen.png" alt="Duim Omhoog">
+    </div>
+  </div>
+  
+  <h1>Creëer je eigen verhaal met gebarentaal</h1>
+  <p>
+    Ontdek hoe vloeiend jij bent in gebarentaal. <br>
+    Oefen verschillende gebaren en zet ze samen om je eigen unieke verhaal tot leven te brengen.
+    <br>
+    <br>
+    Klaar om te beginnen? Steek je duim omhoog.
+    </p>
+  
+  <video id="video" class="hidden" width="640" height="480" autoplay></video>
+  <canvas id="canvas" class="hidden" width="640" height="480"></canvas>
+  
+  <div id="status" class="hidden">Model loaded. Waiting for gesture...</div>
+  <p id="instructions" class="hidden">Maak een gebaar om verder te gaan.</p>
+</body>
+</html>

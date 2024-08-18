@@ -1,0 +1,54 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-image: url('/public/achtergrond.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    margin: 0;
+  }
+  
+  h1 {
+    margin-bottom: 10px;
+    color: white;
+    font-size: 3rem;
+  }
+  
+  p {
+    margin-bottom: 20px;
+    color: white;
+    font-size: 1rem;
+  }
+  
+  #gestures {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .gesture {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .gesture img {
+    width: 300px;
+    height: 200px;
+  }
+  
+  #status {
+    font-size: 1.5em;
+    margin-top: 20px;
+    color: white;
+  }
+  
+  .hidden {
+    display: none;
+  }

@@ -73,8 +73,8 @@ async function detectHands() {
           gestures.classList.add('hidden'); 
 
           setTimeout(() => {
-            window.location.href = '/tussenscherm/tussen.html';
-          }, 3000);
+            window.location.href = '/Verhaalscherm/verhaal.html';
+          }, 7000);
         }
       }
 
